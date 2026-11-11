@@ -1,143 +1,184 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>SenseCheq Configurator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SenseCheq Colour Configurator</title>
 
-    <style>
+<style>
 
-        body{
-            font-family: Arial, sans-serif;
-            margin:20px;
-            display:flex;
-            gap:30px;
-        }
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    display:flex;
+    gap:30px;
+}
 
-        #controls{
-            width:300px;
-        }
+#controls{
+    width:320px;
+    overflow-y:auto;
+}
 
-        #svg-container{
-            flex:1;
-        }
+.part{
+    border:1px solid #ddd;
+    padding:10px;
+    margin-bottom:10px;
+    border-radius:5px;
+}
 
-        svg{
-            width:800px;
-            max-width:100%;
-        }
+.part h3{
+    margin-top:0;
+    margin-bottom:10px;
+    font-size:14px;
+}
 
-        .part{
-            margin-bottom:15px;
-            padding-bottom:10px;
-            border-bottom:1px solid #ddd;
-        }
+input[type="color"]{
+    width:100%;
+    height:40px;
+}
 
-    </style>
+input[type="range"]{
+    width:100%;
+}
+
+#svg-container{
+    flex:1;
+}
+
+#svg-container svg{
+    width:100%;
+    max-width:900px;
+    height:auto;
+}
+
+</style>
 </head>
 
 <body>
 
 <div id="controls">
-    <h1>SenseCheq Configurator</h1>
+    <h2>SenseCheq Configurator</h2>
 </div>
 
 <div id="svg-container"></div>
 
 <script>
 
-const parts = [
-    "screen_surround",
-    "stem",
-    "stem_base",
-    "enclosure_bottom",
-    "faceplate",
-    "button",
-    "enclosure_top"
-];
+window.addEventListener("DOMContentLoaded", function(){
 
-fetch("sensecheq_picker.svg")
-.then(response => response.text())
-.then(svg => {
+    const parts = [
+        "screen_surround",
+        "stem",
+        "stem_base",
+        "enclosure_bottom",
+        "faceplate",
+        "button",
+        "enclosure_top"
+    ];
 
-    document.getElementById("svg-container").innerHTML = svg;
+    fetch("sensecheq_picker.svg")
+    .then(r => r.text())
+    .then(svgText => {
 
-    const controls =
-        document.getElementById("controls");
+        document.getElementById("svg-container").innerHTML = svgText;
 
-    parts.forEach(part => {
+        const controls =
+            document.getElementById("controls");
 
-        const div =
-            document.createElement("div");
+        parts.forEach(part => {
 
-        div.className = "part";
+            const shape =
+                document.getElementById(part);
 
-        div.innerHTML = `
-            <strong>${part}</strong><br>
-
-            <input
-                type="color"
-                id="${part}_colour">
-
-            <br><br>
-
-            Opacity
-
-            <input
-                type="range"
-                id="${part}_opacity"
-                min="0"
-                max="100"
-                value="100">
-
-            <span
-                id="${part}_opacity_label">
-                100%
-            </span>
-        `;
-
-        controls.appendChild(div);
-
-        const shape =
-            document.getElementById(part);
-
-        const colour =
-            document.getElementById(
-                `${part}_colour`
-            );
-
-        const opacity =
-            document.getElementById(
-                `${part}_opacity`
-            );
-
-        const label =
-            document.getElementById(
-                `${part}_opacity_label`
-            );
-
-        colour.addEventListener(
-            "input",
-            function(){
-
-                shape.style.fill =
-                    this.value;
-
+            if(!shape){
+                console.error(
+                    "Cannot find SVG part:",
+                    part
+                );
+                return;
             }
-        );
 
-        opacity.addEventListener(
-            "input",
-            function(){
+            const panel =
+                document.createElement("div");
 
-                shape.style.fillOpacity =
-                    this.value / 100;
+            panel.className = "part";
 
-                label.textContent =
-                    this.value + "%";
+            panel.innerHTML = `
+                <h3>${part}</h3>
 
-            }
-        );
+                <input
+                    type="color"
+                    id="${part}_colour"
+                    value="#808080">
 
+                <br><br>
+
+                Opacity:
+                <span
+                    id="${part}_opacity_text">
+                    100%
+                </span>
+
+                <input
+                    type="range"
+                    id="${part}_opacity"
+                    min="0"
+                    max="100"
+                    value="100">
+            `;
+
+            controls.appendChild(panel);
+
+            const colourPicker =
+                document.getElementById(
+                    `${part}_colour`
+                );
+
+            const opacitySlider =
+                document.getElementById(
+                    `${part}_opacity`
+                );
+
+            const opacityText =
+                document.getElementById(
+                    `${part}_opacity_text`
+                );
+
+            colourPicker.addEventListener(
+                "input",
+                function(){
+
+                    shape.style.fill =
+                        this.value;
+
+                }
+            );
+
+            opacitySlider.addEventListener(
+                "input",
+                function(){
+
+                    shape.style.fillOpacity =
+                        this.value / 100;
+
+                    opacityText.textContent =
+                        this.value + "%";
+
+                }
+            );
+
+        });
+
+    })
+    .catch(err => {
+        console.error(err);
+
+        document.getElementById(
+            "svg-container"
+        ).innerHTML =
+        "<h2>Failed to load SVG</h2>";
     });
 
 });
