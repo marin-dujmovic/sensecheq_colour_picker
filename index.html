@@ -1,3 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SenseCheq Configurator</title>
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            margin:20px;
+            display:flex;
+            gap:30px;
+        }
+
+        #controls{
+            width:300px;
+        }
+
+        #svg-container{
+            flex:1;
+        }
+
+        svg{
+            width:800px;
+            max-width:100%;
+        }
+
+        .part{
+            margin-bottom:15px;
+            padding-bottom:10px;
+            border-bottom:1px solid #ddd;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="controls">
+    <h1>SenseCheq Configurator</h1>
+</div>
+
+<div id="svg-container"></div>
+
 <script>
 
 const parts = [
@@ -21,19 +66,22 @@ fetch("sensecheq_picker.svg")
 
     parts.forEach(part => {
 
-        const div = document.createElement("div");
+        const div =
+            document.createElement("div");
+
+        div.className = "part";
 
         div.innerHTML = `
-            <h3>${part}</h3>
+            <strong>${part}</strong><br>
 
             <input
                 type="color"
-                id="${part}_colour"
-                value="#808080">
+                id="${part}_colour">
 
             <br><br>
 
-            Opacity:
+            Opacity
+
             <input
                 type="range"
                 id="${part}_opacity"
@@ -41,11 +89,10 @@ fetch("sensecheq_picker.svg")
                 max="100"
                 value="100">
 
-            <span id="${part}_opacity_label">
+            <span
+                id="${part}_opacity_label">
                 100%
             </span>
-
-            <hr>
         `;
 
         controls.appendChild(div);
@@ -53,24 +100,24 @@ fetch("sensecheq_picker.svg")
         const shape =
             document.getElementById(part);
 
-        const colourPicker =
+        const colour =
             document.getElementById(
-                part + "_colour"
+                `${part}_colour`
             );
 
-        const opacitySlider =
+        const opacity =
             document.getElementById(
-                part + "_opacity"
+                `${part}_opacity`
             );
 
-        const opacityLabel =
+        const label =
             document.getElementById(
-                part + "_opacity_label"
+                `${part}_opacity_label`
             );
 
-        colourPicker.addEventListener(
+        colour.addEventListener(
             "input",
-            function() {
+            function(){
 
                 shape.style.fill =
                     this.value;
@@ -78,14 +125,14 @@ fetch("sensecheq_picker.svg")
             }
         );
 
-        opacitySlider.addEventListener(
+        opacity.addEventListener(
             "input",
-            function() {
+            function(){
 
                 shape.style.fillOpacity =
                     this.value / 100;
 
-                opacityLabel.textContent =
+                label.textContent =
                     this.value + "%";
 
             }
@@ -96,3 +143,6 @@ fetch("sensecheq_picker.svg")
 });
 
 </script>
+
+</body>
+</html>
