@@ -1,167 +1,98 @@
-<!DOCTYPE html>
-<html>
+<script>
 
-<head>
-    <title>SenseCheq Colour Configurator</title>
+const parts = [
+    "screen_surround",
+    "stem",
+    "stem_base",
+    "enclosure_bottom",
+    "faceplate",
+    "button",
+    "enclosure_top"
+];
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1400px;
-            margin: auto;
-            padding: 20px;
-            display: flex;
-            gap: 30px;
-        }
+fetch("sensecheq_picker.svg")
+.then(response => response.text())
+.then(svg => {
 
-        #controls {
-            width: 350px;
-        }
+    document.getElementById("svg-container").innerHTML = svg;
 
-        .row {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
+    const controls =
+        document.getElementById("controls");
 
-        .row label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+    parts.forEach(part => {
 
-        .row input[type="color"] {
-            width: 100%;
-            height: 40px;
-        }
+        const div = document.createElement("div");
 
-        .row input[type="range"] {
-            width: 100%;
-        }
+        div.innerHTML = `
+            <h3>${part}</h3>
 
-        #svg-container {
-            flex: 1;
-        }
+            <input
+                type="color"
+                id="${part}_colour"
+                value="#808080">
 
-        svg {
-            max-width: 100%;
-            height: auto;
-        }
+            <br><br>
 
-        .opacity-label {
-            font-size: 0.9em;
-            color: #666;
-        }
-    </style>
-</head>
+            Opacity:
+            <input
+                type="range"
+                id="${part}_opacity"
+                min="0"
+                max="100"
+                value="100">
 
-<body>
+            <span id="${part}_opacity_label">
+                100%
+            </span>
 
-    <div id="controls">
-        <h1>SenseCheq Configurator</h1>
-    </div>
+            <hr>
+        `;
 
-    <div id="svg-container"></div>
+        controls.appendChild(div);
 
-    <script>
+        const shape =
+            document.getElementById(part);
 
-        const parts = [
-            "screen_surround",
-            "stem",
-            "stem_base",
-            "enclosure_bottom",
-            "faceplate",
-            "button",
-            "enclosure_top"
-        ];
+        const colourPicker =
+            document.getElementById(
+                part + "_colour"
+            );
 
-        fetch("sensecheq_picker.svg")
-            .then(response => response.text())
-            .then(svg => {
+        const opacitySlider =
+            document.getElementById(
+                part + "_opacity"
+            );
 
-                document.getElementById("svg-container").innerHTML = svg;
+        const opacityLabel =
+            document.getElementById(
+                part + "_opacity_label"
+            );
 
-                const controls =
-                    document.getElementById("controls");
+        colourPicker.addEventListener(
+            "input",
+            function() {
 
-                parts.forEach(part => {
+                shape.style.fill =
+                    this.value;
 
-                    controls.innerHTML += `
-                    <div class="row">
+            }
+        );
 
-                        <label>${part}</label>
+        opacitySlider.addEventListener(
+            "input",
+            function() {
 
-                        <input
-                            type="color"
-                            id="${part}_colour"
-                            value="#808080">
+                shape.style.fillOpacity =
+                    this.value / 100;
 
-                        <div class="opacity-label">
-                            Opacity:
-                            <span id="${part}_opacity_value">
-                                100%
-                            </span>
-                        </div>
+                opacityLabel.textContent =
+                    this.value + "%";
 
-                        <input
-                            type="range"
-                            id="${part}_opacity"
-                            min="0"
-                            max="100"
-                            value="100">
+            }
+        );
 
-                    </div>
-                    `;
+    });
 
-                    const shape =
-                        document.getElementById(part);
+});
 
-                    if (!shape) {
-                        console.warn(
-                            "Cannot find SVG element:",
-                            part
-                        );
-                        return;
-                    }
-
-                    const colour =
-                        document.getElementById(
-                            part + "_colour"
-                        );
-
-                    const opacity =
-                        document.getElementById(
-                            part + "_opacity"
-                        );
-
-                    const opacityLabel =
-                        document.getElementById(
-                            part + "_opacity_value"
-                        );
-
-                    colour.addEventListener("input", () => {
-
-                        shape.style.fill =
-                            colour.value;
-
-                    });
-
-                    opacity.addEventListener("input", () => {
-
-                        shape.style.fillOpacity =
-                            opacity.value / 100;
-
-                        opacityLabel.innerText =
-                            opacity.value + "%";
-
-                    });
-
-                });
-
-            });
-
-    </script>
-
-</body>
-
-</html>
+</script>
