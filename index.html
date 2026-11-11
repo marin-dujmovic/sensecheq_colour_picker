@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SenseCheq Configurator</title>
+
+    <style>
+
+        body{
+            font-family: Arial, sans-serif;
+            max-width:1200px;
+            margin:auto;
+            padding:20px;
+        }
+
+        .row{
+            margin-bottom:12px;
+        }
+
+        #svg-container{
+            margin-top:30px;
+        }
+
+        svg{
+            width:700px;
+            border:1px solid #ddd;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h1>SenseCheq Colour Configurator</h1>
+
+<div id="controls"></div>
+
+<div id="svg-container"></div>
+
+<script>
+
+const parts = [
+    "screen_surround",
+    "stem",
+    "stem_base",
+    "enclosure_bottom",
+    "faceplate",
+    "button",
+    "enclosure_top"
+];
+
+fetch("sensecheq_picker.svg")
+.then(r => r.text())
+.then(svg => {
+
+    document.getElementById("svg-container").innerHTML = svg;
+
+    const controls =
+        document.getElementById("controls");
+
+    parts.forEach(part => {
+
+        controls.innerHTML += `
+        <div class="row">
+
+            <strong>${part}</strong>
+
+            <input
+                type="color"
+                id="${part}_colour"
+                value="#808080">
+
+            Opacity
+
+            <input
+                type="range"
+                id="${part}_opacity"
+                min="0"
+                max="100"
+                value="100">
+
+            <span id="${part}_opacity_value">
+                100%
+            </span>
+
+        </div>
+        `;
+
+        const shape =
+            document.getElementById(part);
+
+        const colour =
+            document.getElementById(
+              part + "_colour"
+            );
+
+        const opacity =
+            document.getElementById(
+              part + "_opacity"
+            );
+
+        const opacityLabel =
+            document.getElementById(
+              part + "_opacity_value"
+            );
+
+        colour.addEventListener("input", () => {
+
+            shape.setAttribute(
+              "fill",
+              colour.value
+            );
+
+        });
+
+        opacity.addEventListener("input", () => {
+
+            shape.setAttribute(
+              "fill-opacity",
+              opacity.value / 100
+            );
+
+            opacityLabel.innerText =
+              opacity.value + "%";
+
+        });
+
+    });
+
+});
+
+</script>
+
+</body>
+
+</html>
