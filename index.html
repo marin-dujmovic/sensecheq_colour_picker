@@ -6,6 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SenseCheq Colour Configurator</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
 <style>
 
 body{
@@ -43,6 +45,14 @@ input[type="range"]{
     width:100%;
 }
 
+button{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    font-size:14px;
+    cursor:pointer;
+}
+
 #svg-container{
     flex:1;
 }
@@ -59,7 +69,13 @@ input[type="range"]{
 <body>
 
 <div id="controls">
+
     <h2>SenseCheq Configurator</h2>
+
+    <button id="downloadPng">
+        Download PNG
+    </button>
+
 </div>
 
 <div id="svg-container"></div>
@@ -79,10 +95,13 @@ window.addEventListener("DOMContentLoaded", function(){
     ];
 
     fetch("sensecheq_picker.svg")
-    .then(r => r.text())
+
+    .then(response => response.text())
+
     .then(svgText => {
 
-        document.getElementById("svg-container").innerHTML = svgText;
+        document.getElementById("svg-container").innerHTML =
+            svgText;
 
         const controls =
             document.getElementById("controls");
@@ -93,10 +112,12 @@ window.addEventListener("DOMContentLoaded", function(){
                 document.getElementById(part);
 
             if(!shape){
+
                 console.error(
                     "Cannot find SVG part:",
                     part
                 );
+
                 return;
             }
 
@@ -116,8 +137,7 @@ window.addEventListener("DOMContentLoaded", function(){
                 <br><br>
 
                 Opacity:
-                <span
-                    id="${part}_opacity_text">
+                <span id="${part}_opacity_text">
                     100%
                 </span>
 
@@ -171,14 +191,68 @@ window.addEventListener("DOMContentLoaded", function(){
 
         });
 
+        //
+        // DOWNLOAD PNG BUTTON
+        //
+        document
+            .getElementById("downloadPng")
+            .addEventListener(
+                "click",
+                function(){
+
+                    const svg =
+                        document.querySelector(
+                            "#svg-container svg"
+                        );
+
+                    htmlToImage
+                        .toPng(svg, {
+                            pixelRatio: 3,
+                            backgroundColor: "white"
+                        })
+
+                        .then(function(dataUrl){
+
+                            const link =
+                                document.createElement("a");
+
+                            link.download =
+                                "sensecheq-design.png";
+
+                            link.href =
+                                dataUrl;
+
+                            link.click();
+
+                        })
+
+                        .catch(function(error){
+
+                            console.error(
+                                "PNG export failed",
+                                error
+                            );
+
+                            alert(
+                                "PNG export failed. Check browser console."
+                            );
+
+                        });
+
+                }
+            );
+
     })
-    .catch(err => {
-        console.error(err);
+
+    .catch(error => {
+
+        console.error(error);
 
         document.getElementById(
             "svg-container"
         ).innerHTML =
         "<h2>Failed to load SVG</h2>";
+
     });
 
 });
